@@ -19,7 +19,7 @@ Este documento detalla el progreso actual y los próximos pasos para el desarrol
 - [x] **Sincronización de Datos (React Query)**:
     - [x] **Miembros**: Carga, filtrado y registro de nuevos miembros.
     - [x] **Membresías**: Conteo dinámico y creación de nuevos planes.
-    - [x] **Pagos**: Cálculo automático de ingresos totales y pendientes.
+    - [x] **Pagos**: Registro de nuevos pagos y estadísticas en tiempo real.
     - [x] **Mensajería**: Historial de chats y envío de mensajes persistente.
     - [x] **Clases**: Sincronización completa con manejo de nulos para la agenda.
     - [x] **Configuración**: Persistencia total de datos del gimnasio y catálogo.
