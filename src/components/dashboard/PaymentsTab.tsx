@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Download, CreditCard, Banknote, Building2, Calendar } from "lucide-react";
+import { Search, Download, CreditCard, Banknote, Building2, Calendar, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,64 +17,26 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/lib/supabase";
 
-// Mock data
-const mockPayments = [
-  {
-    id: 1,
-    member: "María García",
-    amount: 799,
-    date: "2024-01-15",
-    method: "card",
-    status: "paid",
-    plan: "Premium",
-  },
-  {
-    id: 2,
-    member: "Carlos López",
-    amount: 499,
-    date: "2024-01-14",
-    method: "cash",
-    status: "paid",
-    plan: "Básico",
-  },
-  {
-    id: 3,
-    member: "Ana Martínez",
-    amount: 799,
-    date: "2024-01-14",
-    method: "transfer",
-    status: "pending",
-    plan: "Premium",
-  },
-  {
-    id: 4,
-    member: "Roberto Sánchez",
-    amount: 1299,
-    date: "2024-01-13",
-    method: "card",
-    status: "paid",
-    plan: "VIP",
-  },
-  {
-    id: 5,
-    member: "Laura Hernández",
-    amount: 799,
-    date: "2024-01-12",
-    method: "transfer",
-    status: "paid",
-    plan: "Premium",
-  },
-  {
-    id: 6,
-    member: "Diego Torres",
-    amount: 499,
-    date: "2024-01-12",
-    method: "cash",
-    status: "pending",
-    plan: "Básico",
-  },
-];
+const fetchPayments = async () => {
+  const { data, error } = await supabase
+    .from("payments")
+    .select(`
+      *,
+      members (
+        full_name,
+        membership_plans (
+          name
+        )
+      )
+    `)
+    .order("payment_date", { ascending: false });
+
+  if (error) throw error;
+  return data;
+};
 
 const getMethodIcon = (method: string) => {
   switch (method) {
@@ -117,26 +79,50 @@ const PaymentsTab = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
-  const filteredPayments = mockPayments.filter((payment) => {
-    const matchesSearch = payment.member.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === "all" || payment.status === statusFilter;
-    return matchesSearch && matchesStatus;
+  const { data: payments, isLoading, error } = useQuery({
+    queryKey: ["payments"],
+    queryFn: fetchPayments,
   });
 
-  const totalPaid = mockPayments
-    .filter((p) => p.status === "paid")
-    .reduce((sum, p) => sum + p.amount, 0);
+  const filteredPayments = payments?.filter((payment) => {
+    const memberName = payment.members?.full_name || "";
+    const matchesSearch = memberName.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === "all" || payment.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  }) || [];
 
-  const totalPending = mockPayments
-    .filter((p) => p.status === "pending")
-    .reduce((sum, p) => sum + p.amount, 0);
+  const totalPaid = payments
+    ?.filter((p) => p.status === "paid")
+    .reduce((sum, p) => sum + p.amount, 0) || 0;
+
+  const totalPending = payments
+    ?.filter((p) => p.status === "pending")
+    .reduce((sum, p) => sum + p.amount, 0) || 0;
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 gap-4">
+        <Loader2 className="w-10 h-10 text-primary animate-spin" />
+        <p className="text-muted-foreground animate-pulse">Cargando pagos...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="card-fitness border-destructive/50 bg-destructive/10 p-8 text-center">
+        <p className="text-destructive font-semibold">Error al cargar los pagos</p>
+        <p className="text-sm text-muted-foreground mt-2">{(error as any).message}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="card-fitness">
-          <p className="text-sm text-muted-foreground mb-1">Ingresos del Mes</p>
+          <p className="text-sm text-muted-foreground mb-1">Ingresos Totales</p>
           <p className="text-2xl font-bold text-primary">${totalPaid.toLocaleString()}</p>
           <p className="text-xs text-muted-foreground mt-1">Cobrado</p>
         </div>
@@ -147,13 +133,13 @@ const PaymentsTab = () => {
         </div>
         <div className="card-fitness">
           <p className="text-sm text-muted-foreground mb-1">Transacciones</p>
-          <p className="text-2xl font-bold">{mockPayments.length}</p>
-          <p className="text-xs text-muted-foreground mt-1">Este mes</p>
+          <p className="text-2xl font-bold">{payments?.length || 0}</p>
+          <p className="text-xs text-muted-foreground mt-1">Historial total</p>
         </div>
         <div className="card-fitness">
           <p className="text-sm text-muted-foreground mb-1">Promedio</p>
           <p className="text-2xl font-bold">
-            ${Math.round(totalPaid / mockPayments.filter((p) => p.status === "paid").length).toLocaleString()}
+            ${Math.round(totalPaid / (payments?.filter((p) => p.status === "paid").length || 1)).toLocaleString()}
           </p>
           <p className="text-xs text-muted-foreground mt-1">Por pago</p>
         </div>
@@ -208,15 +194,15 @@ const PaymentsTab = () => {
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
                       <span className="text-primary font-semibold text-sm">
-                        {payment.member.split(" ").map((n) => n[0]).join("")}
+                        {payment.members?.full_name?.split(" ").map((n: string) => n[0]).join("") || "?"}
                       </span>
                     </div>
-                    <span className="font-medium">{payment.member}</span>
+                    <span className="font-medium">{payment.members?.full_name || "Membro borrado"}</span>
                   </div>
                 </TableCell>
                 <TableCell>
                   <span className="px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium">
-                    {payment.plan}
+                    {payment.members?.membership_plans?.name || "Sin plan"}
                   </span>
                 </TableCell>
                 <TableCell className="font-semibold">
@@ -225,7 +211,7 @@ const PaymentsTab = () => {
                 <TableCell>
                   <div className="flex items-center gap-1 text-sm">
                     <Calendar className="w-4 h-4 text-muted-foreground" />
-                    {new Date(payment.date).toLocaleDateString("es-MX", {
+                    {new Date(payment.payment_date).toLocaleDateString("es-MX", {
                       day: "numeric",
                       month: "short",
                     })}
@@ -240,6 +226,13 @@ const PaymentsTab = () => {
                 <TableCell>{getStatusBadge(payment.status)}</TableCell>
               </TableRow>
             ))}
+            {filteredPayments.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
+                  No se encontraron pagos.
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </div>

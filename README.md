@@ -1,73 +1,66 @@
-# Welcome to your Lovable project
+# Fit IA - Asistente de Gestión Inteligente para Gimnasios
 
-## Project info
+Fit IA es una plataforma integral diseñada para modernizar y automatizar la gestión de gimnasios y centros de fitness. A través de la integración con **WhatsApp e Inteligencia Artificial**, permite a los dueños de gimnasios delegar tareas repetitivas y ofrecer una experiencia premium a sus miembros las 24 horas del día.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## 🚀 Características Principales
 
-## How can I edit this code?
+- **🤖 Asistente de WhatsApp con IA**: Atiende consultas, agenda clases y procesa pagos automáticamente sin intervención humana.
+- **👥 Gestión de Miembros**: Panel de control completo para administrar altas, bajas, asistencias y perfiles de usuarios.
+- **💳 Control de Membresías y Pagos**: Registro automatizado de planes, vencimientos y recordatorios de cobro.
+- **📅 Sistema de Reservas**: Calendario inteligente para clases con gestión de cupos y listas de espera.
+- **📊 Analíticas en Tiempo Real**: Dashboard con métricas clave como retención, ingresos y popularidad de clases.
+- **💫 Experiencia "Sin Apps"**: Los miembros interactúan directamente desde WhatsApp, eliminando la fricción de descargar nuevas aplicaciones.
 
-There are several ways of editing your application.
+## 🛠️ Tecnologías Utilizadas
 
-**Use Lovable**
+Este proyecto está construido con un stack moderno enfocado en el rendimiento y la experiencia de usuario:
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+- **Core**: [React](https://reactjs.org/) + [Vite](https://vitejs.dev/) + [TypeScript](https://www.typescriptlang.org/)
+- **Estilos**: [Tailwind CSS](https://tailwindcss.com/)
+- **Componentes UI**: [shadcn/ui](https://ui.shadcn.com/) (basado en Radix UI)
+- **Gestión de Datos**: [TanStack Query (React Query)](https://tanstack.com/query/latest)
+- **Iconos**: [Lucide React](https://lucide.dev/)
+- **Formularios**: [React Hook Form](https://react-hook-form.com/) + [Zod](https://zod.dev/)
+- **Visualización**: [Recharts](https://recharts.org/)
+- **Animaciones**: Tailwind CSS Animate & Framer Motion concepts.
 
-Changes made via Lovable will be committed automatically to this repo.
+## 📦 Estructura del Proyecto
 
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```text
+src/
+├── components/     # Componentes reutilizables y de dashboard
+│   ├── dashboard/  # Pestañas y widgets específicos del panel
+│   └── ui/         # Componentes base de shadcn/ui
+├── hooks/          # Hooks personalizados
+├── pages/          # Vistas principales (Landing, Auth, Dashboard)
+└── lib/            # Utilidades y configuraciones
 ```
 
-**Edit a file directly in GitHub**
+## 💻 Desarrollo Local
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Para comenzar a trabajar en este proyecto localmente, sigue estos pasos:
 
-**Use GitHub Codespaces**
+1. **Clonar el repositorio**
+   ```bash
+   git clone https://github.com/Proiafl/fit-ai-assistant.git
+   cd fit-ai-assistant
+   ```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+2. **Instalar dependencias**
+   ```bash
+   npm install
+   ```
 
-## What technologies are used for this project?
+3. **Iniciar el servidor de desarrollo**
+   ```bash
+   npm run dev
+   ```
 
-This project is built with:
+4. **Construir para producción**
+   ```bash
+   npm run build
+   ```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+---
 
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+*Proyecto desarrollado con ❤️ para revolucionar la industria del fitness.*

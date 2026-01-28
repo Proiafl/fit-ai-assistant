@@ -1,26 +1,69 @@
 import { useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { Zap, Mail, Lock, User, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { supabase } from "@/lib/supabase";
+import { toast } from "sonner";
 
 const AuthPage = () => {
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [isLogin, setIsLogin] = useState(searchParams.get("mode") !== "register");
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement auth with Supabase
-    console.log("Form submitted:", formData);
-    // For now, redirect to dashboard
-    window.location.href = "/dashboard";
+    setIsLoading(true);
+
+    try {
+      if (isLogin) {
+        const { error } = await supabase.auth.signInWithPassword({
+          email: formData.email,
+          password: formData.password,
+        });
+        if (error) throw error;
+        toast.success("¡Bienvenido de nuevo!");
+        navigate("/dashboard");
+      } else {
+        const { error } = await supabase.auth.signUp({
+          email: formData.email,
+          password: formData.password,
+          options: {
+            data: {
+              gym_name: formData.name,
+            },
+          },
+        });
+        if (error) throw error;
+        toast.success("Cuenta creada. Por favor, verifica tu correo electrónico.");
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Ocurrió un error");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleOAuthLogin = async (provider: 'google' | 'github') => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/dashboard`,
+        },
+      });
+      if (error) throw error;
+    } catch (error: any) {
+      toast.error(error.message || "Error al iniciar sesión");
+    }
   };
 
   return (
@@ -118,9 +161,10 @@ const AuthPage = () => {
             <Button
               type="submit"
               className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary/90 font-semibold"
+              disabled={isLoading}
             >
-              {isLogin ? "Iniciar Sesión" : "Crear Cuenta"}
-              <ArrowRight className="w-5 h-5 ml-2" />
+              {isLoading ? "Procesando..." : (isLogin ? "Iniciar Sesión" : "Crear Cuenta")}
+              {!isLoading && <ArrowRight className="w-5 h-5 ml-2" />}
             </Button>
           </form>
 
@@ -136,9 +180,13 @@ const AuthPage = () => {
             </div>
           </div>
 
-          {/* Social buttons */}
           <div className="grid grid-cols-2 gap-4">
-            <Button variant="outline" className="h-12 bg-secondary border-border hover:bg-secondary/80">
+            <Button
+              variant="outline"
+              className="h-12 bg-secondary border-border hover:bg-secondary/80"
+              onClick={() => handleOAuthLogin('google')}
+              disabled={isLoading}
+            >
               <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                 <path
                   fill="currentColor"
@@ -159,7 +207,12 @@ const AuthPage = () => {
               </svg>
               Google
             </Button>
-            <Button variant="outline" className="h-12 bg-secondary border-border hover:bg-secondary/80">
+            <Button
+              variant="outline"
+              className="h-12 bg-secondary border-border hover:bg-secondary/80"
+              onClick={() => handleOAuthLogin('github')}
+              disabled={isLoading}
+            >
               <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
               </svg>
@@ -184,7 +237,7 @@ const AuthPage = () => {
       {/* Right side - Visual */}
       <div className="hidden lg:flex flex-1 relative bg-gradient-to-br from-primary/20 via-background to-background">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_hsl(142_71%_45%_/_0.2)_0%,_transparent_60%)]" />
-        
+
         <div className="flex items-center justify-center w-full p-12 relative z-10">
           <div className="max-w-md text-center">
             <div className="w-24 h-24 rounded-3xl bg-primary/20 flex items-center justify-center mx-auto mb-8 animate-pulse-glow">
@@ -194,7 +247,7 @@ const AuthPage = () => {
               Automatiza tu gimnasio con inteligencia artificial
             </h2>
             <p className="text-muted-foreground text-lg">
-              Gestiona membresías, reservas y pagos mientras tu asistente virtual 
+              Gestiona membresías, reservas y pagos mientras tu asistente virtual
               atiende a tus miembros por WhatsApp las 24 horas.
             </p>
 

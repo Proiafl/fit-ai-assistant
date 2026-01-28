@@ -1,65 +1,161 @@
-import { useState } from "react";
-import { Save, Building2, Clock, MapPin, Link, Plus, X } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Save, Building2, Clock, MapPin, Link, Plus, X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/lib/supabase";
 
 const SettingsTab = () => {
-  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [gymId, setGymId] = useState<string | null>(null);
   const [config, setConfig] = useState({
-    gymName: "Gym Fitness Pro",
-    address: "Av. Insurgentes Sur 1234, Col. Del Valle, CDMX",
-    timezone: "America/Mexico_City",
+    gymName: "",
+    address: "",
     openingTime: "06:00",
     closingTime: "22:00",
     webhookUrl: "",
   });
 
-  const [plans, setPlans] = useState(["Básico", "Premium", "VIP"]);
-  const [classes, setClasses] = useState(["Spinning", "Yoga", "CrossFit", "Zumba", "HIIT", "Pilates"]);
   const [newPlan, setNewPlan] = useState("");
   const [newClass, setNewClass] = useState("");
 
-  const handleSave = () => {
-    toast({
-      title: "Configuración guardada",
-      description: "Los cambios se han aplicado correctamente.",
-    });
-  };
+  // 1. Fetch Gym Data
+  const { data: gymData, isLoading: loadingGym } = useQuery({
+    queryKey: ["gym_settings"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("gyms").select("*").single();
+      if (error) throw error;
+      return data;
+    },
+  });
 
-  const addPlan = () => {
-    if (newPlan.trim() && !plans.includes(newPlan.trim())) {
-      setPlans([...plans, newPlan.trim()]);
+  // 2. Fetch Plans
+  const { data: plansData, isLoading: loadingPlans } = useQuery({
+    queryKey: ["membership_plans"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("membership_plans").select("*");
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // 3. Fetch Classes
+  const { data: classesData, isLoading: loadingClasses } = useQuery({
+    queryKey: ["classes"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("classes").select("*");
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  useEffect(() => {
+    if (gymData) {
+      setGymId(gymData.id);
+      setConfig({
+        gymName: gymData.name || "",
+        address: gymData.address || "",
+        openingTime: gymData.settings?.openingTime || "06:00",
+        closingTime: gymData.settings?.closingTime || "22:00",
+        webhookUrl: gymData.settings?.webhookUrl || "",
+      });
+    }
+  }, [gymData]);
+
+  // Mutations
+  const updateGymMutation = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase
+        .from("gyms")
+        .update({
+          name: config.gymName,
+          address: config.address,
+          settings: {
+            openingTime: config.openingTime,
+            closingTime: config.closingTime,
+            webhookUrl: config.webhookUrl,
+          },
+        })
+        .eq("id", gymId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Configuración guardada");
+      queryClient.invalidateQueries({ queryKey: ["gym_settings"] });
+    },
+  });
+
+  const addPlanMutation = useMutation({
+    mutationFn: async (name: string) => {
+      const { error } = await supabase
+        .from("membership_plans")
+        .insert([{ name, price: 0, features: [] }]);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["membership_plans"] });
       setNewPlan("");
-    }
-  };
+      toast.success("Plan añadido");
+    },
+  });
 
-  const removePlan = (plan: string) => {
-    setPlans(plans.filter((p) => p !== plan));
-  };
+  const removePlanMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("membership_plans").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["membership_plans"] });
+      toast.success("Plan eliminado");
+    },
+  });
 
-  const addClass = () => {
-    if (newClass.trim() && !classes.includes(newClass.trim())) {
-      setClasses([...classes, newClass.trim()]);
+  const addClassMutation = useMutation({
+    mutationFn: async (name: string) => {
+      const { error } = await supabase
+        .from("classes")
+        .insert([{ name, instructor: "Coach", color: "bg-primary" }]);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["classes"] });
       setNewClass("");
-    }
-  };
+      toast.success("Clase registrada");
+    },
+  });
 
-  const removeClass = (cls: string) => {
-    setClasses(classes.filter((c) => c !== cls));
-  };
+  const removeClassMutation = useMutation({
+    mutationFn: async (name: string) => {
+      const { error } = await supabase.from("classes").delete().eq("name", name);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["classes"] });
+      toast.success("Clase eliminada");
+    },
+  });
+
+  if (loadingGym || loadingPlans || loadingClasses) {
+    return (
+      <div className="flex h-[400px] items-center justify-center">
+        <Loader2 className="w-10 h-10 text-primary animate-spin" />
+      </div>
+    );
+  }
+
+  const uniqueClassNames = Array.from(new Set(classesData?.map(c => c.name) || []));
 
   return (
-    <div className="max-w-3xl space-y-8">
+    <div className="max-w-3xl space-y-8 pb-10">
       {/* Gym Info */}
       <div className="card-fitness space-y-6">
         <div className="flex items-center gap-3 pb-4 border-b border-border">
           <Building2 className="w-5 h-5 text-primary" />
           <h3 className="text-lg font-semibold">Información del Gimnasio</h3>
         </div>
-
         <div className="grid gap-4">
           <div className="space-y-2">
             <Label htmlFor="gymName">Nombre del gimnasio</Label>
@@ -70,7 +166,6 @@ const SettingsTab = () => {
               className="bg-secondary border-border"
             />
           </div>
-
           <div className="space-y-2">
             <Label htmlFor="address">Dirección</Label>
             <div className="relative">
@@ -92,7 +187,6 @@ const SettingsTab = () => {
           <Clock className="w-5 h-5 text-primary" />
           <h3 className="text-lg font-semibold">Horarios</h3>
         </div>
-
         <div className="grid sm:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="openingTime">Hora de apertura</Label>
@@ -122,34 +216,37 @@ const SettingsTab = () => {
         <div className="flex items-center justify-between pb-4 border-b border-border">
           <h3 className="text-lg font-semibold">Planes Disponibles</h3>
         </div>
-
         <div className="flex flex-wrap gap-2">
-          {plans.map((plan) => (
+          {plansData?.map((plan) => (
             <span
-              key={plan}
+              key={plan.id}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary border border-primary/20"
             >
-              {plan}
+              {plan.name}
               <button
-                onClick={() => removePlan(plan)}
-                className="hover:bg-primary/20 rounded-full p-0.5 transition-colors"
+                onClick={() => removePlanMutation.mutate(plan.id)}
+                className="hover:bg-primary/20 rounded-full p-0.5"
+                disabled={removePlanMutation.isPending}
               >
                 <X className="w-4 h-4" />
               </button>
             </span>
           ))}
         </div>
-
         <div className="flex gap-2">
           <Input
             placeholder="Nuevo plan..."
             value={newPlan}
             onChange={(e) => setNewPlan(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && addPlan()}
+            onKeyDown={(e) => e.key === "Enter" && newPlan.trim() && addPlanMutation.mutate(newPlan.trim())}
             className="bg-secondary border-border"
           />
-          <Button onClick={addPlan} variant="outline" className="border-border">
-            <Plus className="w-4 h-4" />
+          <Button
+            onClick={() => newPlan.trim() && addPlanMutation.mutate(newPlan.trim())}
+            disabled={addPlanMutation.isPending}
+            variant="outline"
+          >
+            {addPlanMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
           </Button>
         </div>
       </div>
@@ -159,67 +256,48 @@ const SettingsTab = () => {
         <div className="flex items-center justify-between pb-4 border-b border-border">
           <h3 className="text-lg font-semibold">Clases Disponibles</h3>
         </div>
-
         <div className="flex flex-wrap gap-2">
-          {classes.map((cls) => (
+          {uniqueClassNames.map((name) => (
             <span
-              key={cls}
+              key={name}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary text-foreground border border-border"
             >
-              {cls}
+              {name}
               <button
-                onClick={() => removeClass(cls)}
-                className="hover:bg-muted rounded-full p-0.5 transition-colors"
+                onClick={() => removeClassMutation.mutate(name)}
+                className="hover:bg-muted rounded-full p-0.5"
+                disabled={removeClassMutation.isPending}
               >
                 <X className="w-4 h-4" />
               </button>
             </span>
           ))}
         </div>
-
         <div className="flex gap-2">
           <Input
             placeholder="Nueva clase..."
             value={newClass}
             onChange={(e) => setNewClass(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && addClass()}
+            onKeyDown={(e) => e.key === "Enter" && newClass.trim() && addClassMutation.mutate(newClass.trim())}
             className="bg-secondary border-border"
           />
-          <Button onClick={addClass} variant="outline" className="border-border">
-            <Plus className="w-4 h-4" />
+          <Button
+            onClick={() => newClass.trim() && addClassMutation.mutate(newClass.trim())}
+            disabled={addClassMutation.isPending}
+            variant="outline"
+          >
+            {addClassMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
           </Button>
         </div>
       </div>
 
-      {/* Webhook */}
-      <div className="card-fitness space-y-6">
-        <div className="flex items-center gap-3 pb-4 border-b border-border">
-          <Link className="w-5 h-5 text-primary" />
-          <h3 className="text-lg font-semibold">Integración WhatsApp</h3>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="webhookUrl">URL del Webhook (Twilio)</Label>
-          <Input
-            id="webhookUrl"
-            placeholder="https://tu-proyecto.supabase.co/functions/v1/twilio-webhook"
-            value={config.webhookUrl}
-            onChange={(e) => setConfig({ ...config, webhookUrl: e.target.value })}
-            className="bg-secondary border-border"
-          />
-          <p className="text-sm text-muted-foreground">
-            Configura esta URL en tu cuenta de Twilio para recibir mensajes de WhatsApp.
-          </p>
-        </div>
-      </div>
-
-      {/* Save button */}
       <div className="flex justify-end">
         <Button
-          onClick={handleSave}
-          className="bg-primary text-primary-foreground hover:bg-primary/90"
+          onClick={() => updateGymMutation.mutate()}
+          disabled={updateGymMutation.isPending}
+          className="bg-primary text-primary-foreground"
         >
-          <Save className="w-4 h-4 mr-2" />
+          {updateGymMutation.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
           Guardar Cambios
         </Button>
       </div>
