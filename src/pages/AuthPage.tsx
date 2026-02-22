@@ -57,7 +57,21 @@ const AuthPage = () => {
         toast.success("Cuenta creada. Por favor, verifica tu correo electrónico.");
       }
     } catch (error: any) {
-      toast.error(error.message || "Ocurrió un error");
+      // Translate common Supabase auth errors to Spanish
+      const msg: string = error.message || "";
+      if (msg.includes("Invalid login credentials") || msg.includes("invalid_credentials")) {
+        toast.error("Correo o contraseña incorrectos. Verifica tus datos.");
+      } else if (msg.includes("Email not confirmed")) {
+        toast.error("Debes verificar tu correo antes de iniciar sesión.");
+      } else if (msg.includes("User already registered") || msg.includes("already been registered")) {
+        toast.error("Este correo ya está registrado. Inicia sesión.");
+      } else if (msg.includes("Password should be at least")) {
+        toast.error("La contraseña debe tener al menos 6 caracteres.");
+      } else if (msg.includes("rate limit") || msg.includes("too many requests")) {
+        toast.error("Demasiados intentos. Espera un momento e intenta de nuevo.");
+      } else {
+        toast.error(msg || "Ocurrió un error inesperado. Intenta de nuevo.");
+      }
     } finally {
       setIsLoading(false);
     }
