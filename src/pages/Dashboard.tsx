@@ -21,6 +21,7 @@ import PaymentsTab from "@/components/dashboard/PaymentsTab";
 import SettingsTab from "@/components/dashboard/SettingsTab";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
+import { SubscriptionGuard } from "@/components/SubscriptionGuard";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -167,12 +168,14 @@ const Dashboard = () => {
 
         {/* Tab content */}
         <div className="p-6 flex-1 overflow-auto animate-fade-in custom-scrollbar">
-          {activeTab === "messages" && <MessagesTab />}
-          {activeTab === "members" && <MembersTab />}
-          {activeTab === "memberships" && <MembershipsTab />}
-          {activeTab === "classes" && <ClassesTab />}
-          {activeTab === "payments" && <PaymentsTab />}
-          {activeTab === "settings" && <SettingsTab />}
+          <SubscriptionGuard>
+            {activeTab === "messages" && <MessagesTab />}
+            {activeTab === "members" && <MembersTab />}
+            {activeTab === "memberships" && <MembershipsTab />}
+            {activeTab === "classes" && <ClassesTab />}
+            {activeTab === "payments" && <PaymentsTab />}
+            {activeTab === "settings" && <SettingsTab />}
+          </SubscriptionGuard>
         </div>
       </main>
     </div>
