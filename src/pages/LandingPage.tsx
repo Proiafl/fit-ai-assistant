@@ -46,26 +46,26 @@ const LandingPage = () => {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_hsl(142_71%_45%_/_0.15)_0%,_transparent_50%)]" />
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-        
+
         <div className="container mx-auto px-6 pt-32 pb-20 relative z-10">
           <div className="max-w-4xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-4 py-2 mb-8 animate-fade-in">
               <Zap className="w-4 h-4 text-primary" />
               <span className="text-sm text-primary font-medium">Potenciado por Inteligencia Artificial</span>
             </div>
-            
+
             <h1 className="text-5xl md:text-7xl font-extrabold mb-6 animate-fade-in-up leading-tight">
               Gestiona tu gimnasio
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-primary to-emerald-400">
                 con WhatsApp e IA
               </span>
             </h1>
-            
+
             <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto animate-fade-in-up stagger-1">
-              Fit IA automatiza la gestión de membresías, reservas de clases y pagos. 
+              Fit IA automatiza la gestión de membresías, reservas de clases y pagos.
               Tu asistente virtual atiende a tus miembros 24/7 por WhatsApp.
             </p>
-            
+
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-up stagger-2">
               <Link to="/auth?mode=register">
                 <button className="btn-hero flex items-center gap-2">
@@ -176,10 +176,10 @@ const LandingPage = () => {
                 <span className="text-primary"> tus miembros</span>
               </h2>
               <p className="text-muted-foreground text-lg mb-8">
-                Con Fit IA, tus miembros pueden consultar horarios, reservar clases y verificar 
+                Con Fit IA, tus miembros pueden consultar horarios, reservar clases y verificar
                 su membresía directamente desde WhatsApp, sin descargar apps adicionales.
               </p>
-              
+
               <div className="space-y-4">
                 {[
                   "Respuestas instantáneas las 24 horas",
@@ -240,7 +240,7 @@ const LandingPage = () => {
                   </div>
                 </div>
               </div>
-              
+
               {/* Glow effect */}
               <div className="absolute -inset-4 bg-primary/5 rounded-3xl blur-2xl -z-10" />
             </div>
@@ -248,19 +248,96 @@ const LandingPage = () => {
         </div>
       </section>
 
+      {/* Pricing Section */}
+      <section id="pricing" className="py-24 relative">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_hsl(142_71%_45%_/_0.05)_0%,_transparent_60%)]" />
+        <div className="container mx-auto px-6 relative z-10">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-4 py-2 mb-6">
+              <svg className="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              <span className="text-sm text-primary font-medium">Precios transparentes</span>
+            </div>
+            <h2 className="text-3xl md:text-5xl font-bold mb-4">
+              Planes para cada <span className="text-primary">tamaño de gimnasio</span>
+            </h2>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              14 días de prueba gratis en todos los planes. Sin tarjeta de crédito. Cancela cuando quieras.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {[
+              {
+                name: "Básico",
+                price: 29,
+                color: "border-border",
+                features: ["Hasta 100 miembros", "Gestión de clases y pagos", "Recordatorios automáticos", "Reportes básicos", "Soporte por email"],
+              },
+              {
+                name: "Pro",
+                price: 59,
+                color: "border-primary ring-2 ring-primary/20",
+                badge: "Más Popular",
+                features: ["Miembros ilimitados", "Agente IA WhatsApp 24/7", "Reservas automáticas por IA", "Analytics avanzados", "Soporte prioritario"],
+              },
+              {
+                name: "Premium",
+                price: 99,
+                color: "border-border",
+                features: ["Todo lo de Pro", "Reportes personalizados", "Onboarding 1:1", "Soporte por WhatsApp directo", "Acceso anticipado a features"],
+              },
+            ].map((plan) => (
+              <div
+                key={plan.name}
+                className={`relative bg-card rounded-2xl border-2 p-8 flex flex-col transition-all duration-300 hover:scale-[1.02] ${plan.color}`}
+              >
+                {plan.badge && (
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-xs font-bold px-4 py-1 rounded-full shadow-lg shadow-primary/30">
+                    {plan.badge}
+                  </div>
+                )}
+                <h3 className="text-xl font-bold mb-4">{plan.name}</h3>
+                <div className="mb-6">
+                  <span className="text-4xl font-extrabold">${plan.price}</span>
+                  <span className="text-muted-foreground">/mes</span>
+                </div>
+                <ul className="space-y-3 flex-1 mb-8">
+                  {plan.features.map((f) => (
+                    <li key={f} className="flex items-center gap-2 text-sm">
+                      <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                        <svg className="w-3 h-3 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                      </div>
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <Link to="/auth?mode=register">
+                  <Button
+                    className="w-full"
+                    variant={plan.badge ? "default" : "outline"}
+                  >
+                    Empezar 14 días gratis
+                  </Button>
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-24 relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_hsl(142_71%_45%_/_0.1)_0%,_transparent_50%)]" />
-        
+
         <div className="container mx-auto px-6 text-center relative z-10">
           <h2 className="text-3xl md:text-5xl font-bold mb-6">
             ¿Listo para modernizar tu gimnasio?
           </h2>
           <p className="text-muted-foreground text-lg mb-10 max-w-2xl mx-auto">
-            Únete a cientos de gimnasios que ya automatizan su gestión con Fit IA. 
+            Únete a cientos de gimnasios que ya automatizan su gestión con Fit IA.
             Prueba gratis por 14 días, sin tarjeta de crédito.
           </p>
-          
+
           <Link to="/auth?mode=register">
             <button className="btn-hero animate-pulse-glow">
               Comenzar Prueba Gratis
