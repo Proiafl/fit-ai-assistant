@@ -201,8 +201,8 @@ const PricingPage = () => {
                 <div className="mt-20 text-center">
                     <p className="text-muted-foreground">
                         ¿Preguntas? Escríbenos a{" "}
-                        <a href="mailto:soporte@fitia.app" className="text-primary hover:underline">
-                            soporte@fitia.app
+                        <a href="mailto:soporte@gymiapp.com" className="text-primary hover:underline">
+                            soporte@gymiapp.com
                         </a>{" "}
                         o por WhatsApp directo.
                     </p>

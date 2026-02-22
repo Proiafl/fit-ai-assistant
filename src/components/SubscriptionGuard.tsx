@@ -25,7 +25,7 @@ export function SubscriptionGuard({ children, showBanner = true }: SubscriptionG
                 <div>
                     <h2 className="text-3xl font-bold mb-3">Tu prueba gratuita ha terminado</h2>
                     <p className="text-muted-foreground max-w-md text-lg">
-                        Activa tu suscripción para seguir gestionando tu gimnasio con Fit IA y no perder ningún dato.
+                        Activa tu suscripción para seguir gestionando tu gimnasio con GymIApp y no perder ningún dato.
                     </p>
                 </div>
                 <div className="flex gap-4">

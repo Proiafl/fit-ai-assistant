@@ -12,7 +12,7 @@ const LandingPage = () => {
             <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
               <Zap className="w-6 h-6 text-primary-foreground" />
             </div>
-            <span className="text-xl font-bold">Fit IA</span>
+            <span className="text-xl font-bold">GymIApp</span>
           </div>
           <div className="hidden md:flex items-center gap-8">
             <a href="#features" className="text-muted-foreground hover:text-foreground transition-colors">
@@ -62,7 +62,7 @@ const LandingPage = () => {
             </h1>
 
             <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto animate-fade-in-up stagger-1">
-              Fit IA automatiza la gestión de membresías, reservas de clases y pagos.
+              GymIApp automatiza la gestión de membresías, reservas de clases y pagos.
               Tu asistente virtual atiende a tus miembros 24/7 por WhatsApp.
             </p>
 
@@ -176,7 +176,7 @@ const LandingPage = () => {
                 <span className="text-primary"> tus miembros</span>
               </h2>
               <p className="text-muted-foreground text-lg mb-8">
-                Con Fit IA, tus miembros pueden consultar horarios, reservar clases y verificar
+                Con GymIApp, tus miembros pueden consultar horarios, reservar clases y verificar
                 su membresía directamente desde WhatsApp, sin descargar apps adicionales.
               </p>
 
@@ -205,7 +205,7 @@ const LandingPage = () => {
                     <Zap className="w-6 h-6 text-primary-foreground" />
                   </div>
                   <div>
-                    <div className="font-semibold">Fit IA</div>
+                    <div className="font-semibold">GymIApp</div>
                     <div className="text-sm text-muted-foreground">En línea</div>
                   </div>
                 </div>
@@ -334,7 +334,7 @@ const LandingPage = () => {
             ¿Listo para modernizar tu gimnasio?
           </h2>
           <p className="text-muted-foreground text-lg mb-10 max-w-2xl mx-auto">
-            Únete a cientos de gimnasios que ya automatizan su gestión con Fit IA.
+            Únete a cientos de gimnasios que ya automatizan su gestión con GymIApp.
             Prueba gratis por 14 días, sin tarjeta de crédito.
           </p>
 
@@ -354,10 +354,10 @@ const LandingPage = () => {
               <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
                 <Zap className="w-5 h-5 text-primary-foreground" />
               </div>
-              <span className="font-bold">Fit IA</span>
+              <span className="font-bold">GymIApp</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              © 2024 Fit IA. Todos los derechos reservados.
+              © 2024 GymIApp. Todos los derechos reservados.
             </p>
             <div className="flex items-center gap-6">
               <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">

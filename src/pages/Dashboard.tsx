@@ -74,7 +74,7 @@ const Dashboard = () => {
               <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
                 <Zap className="w-6 h-6 text-primary-foreground" />
               </div>
-              <span className="text-xl font-bold">Fit IA</span>
+              <span className="text-xl font-bold">GymIApp</span>
             </Link>
           </div>
 
