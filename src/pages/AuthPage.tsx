@@ -33,7 +33,7 @@ const AuthPage = () => {
         toast.success("¡Bienvenido de nuevo!");
         navigate("/dashboard");
       } else {
-        const { error } = await supabase.auth.signUp({
+        const { data: signUpData, error } = await supabase.auth.signUp({
           email: formData.email,
           password: formData.password,
           options: {
@@ -43,6 +43,17 @@ const AuthPage = () => {
           },
         });
         if (error) throw error;
+
+        // Auto-create gym record linked to the new user
+        if (signUpData.user) {
+          await supabase.from('gyms').insert([{
+            owner_id: signUpData.user.id,
+            name: formData.name || 'Mi Gimnasio',
+            address: '',
+            settings: {},
+          }]);
+        }
+
         toast.success("Cuenta creada. Por favor, verifica tu correo electrónico.");
       }
     } catch (error: any) {

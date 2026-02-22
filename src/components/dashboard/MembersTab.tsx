@@ -35,6 +35,7 @@ import {
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
+import { useGymId } from "@/hooks/useGymId";
 
 const fetchMembers = async () => {
   const { data, error } = await supabase
@@ -77,6 +78,7 @@ const getMemberStatus = (startDateStr: string) => {
 
 const MembersTab = () => {
   const queryClient = useQueryClient();
+  const { data: gymId } = useGymId();
   const [searchTerm, setSearchTerm] = useState("");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState<any>(null);
@@ -103,7 +105,7 @@ const MembersTab = () => {
 
   const addMemberMutation = useMutation({
     mutationFn: async (member: typeof newMember) => {
-      const { error } = await supabase.from("members").insert([member]);
+      const { error } = await supabase.from("members").insert([{ ...member, gym_id: gymId }]);
       if (error) throw error;
     },
     onSuccess: () => {

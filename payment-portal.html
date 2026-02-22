@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal de Pagos - Fit AI Gym</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            color: white;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .welcome {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .status-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .status-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .member-name {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .status-expired {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .status-warning {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .plan-info {
+            display: flex;
+            justify-content: space-between;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .plans-grid {
+            display: grid;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .plan-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .plan-card:hover {
+            border-color: #6366f1;
+            background: rgba(255, 255, 255, 0.08);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">Fit AI Gym</div>
+            <div class="welcome">Portal de Pagos</div>
+        </div>
+
+        <div class="status-card">
+            <div class="status-header">
+                <div class="member-name">Estado de Membresía</div>
+                <div class="status-badge status-expired">Expirado</div>
+            </div>
+            <div class="plan-info">
+                <span>Plan Actual</span>
+                <span>Mensual Básico</span>
+            </div>
+        </div>
+
+        <h2 class="section-title">Renovar Plan</h2>
+
+        <div class="plans-grid">
+            <div class="plan-card">
+                <div style="font-weight: 600; margin-bottom: 4px;">Plan Mensual</div>
+                <div style="color: rgba(255,255,255,0.7); font-size: 14px;">$29.99 / mes</div>
+            </div>
+            <div class="plan-card" style="border-color: #6366f1; background: rgba(99, 102, 241, 0.1);">
+                <div style="font-weight: 600; margin-bottom: 4px;">Plan Trimestral</div>
+                <div style="color: rgba(255,255,255,0.7); font-size: 14px;">$79.99 / 3 meses</div>
+            </div>
+            <div class="plan-card">
+                <div style="font-weight: 600; margin-bottom: 4px;">Plan Anual</div>
+                <div style="color: rgba(255,255,255,0.7); font-size: 14px;">$299.99 / año</div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

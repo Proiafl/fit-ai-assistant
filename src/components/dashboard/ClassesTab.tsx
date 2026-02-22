@@ -20,6 +20,7 @@ import {
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
+import { useGymId } from "@/hooks/useGymId";
 
 const CLASS_GRADIENTS = [
   "bg-gradient-to-br from-emerald-500 to-teal-600",
@@ -73,6 +74,7 @@ interface ClassDetails {
 
 const ClassesTab = () => {
   const queryClient = useQueryClient();
+  const { data: gymId } = useGymId();
   const [currentWeek, setCurrentWeek] = useState(new Date());
   const [selectedClass, setSelectedClass] = useState<ClassDetails | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -107,7 +109,7 @@ const ClassesTab = () => {
         const { error } = await supabase.from("classes").update(payload).eq("id", selectedClass.id);
         if (error) throw error;
       } else {
-        const { error } = await supabase.from("classes").insert([payload]);
+        const { error } = await supabase.from("classes").insert([{ ...payload, gym_id: gymId }]);
         if (error) throw error;
       }
     },
@@ -364,8 +366,8 @@ const ClassesTab = () => {
                     key={day}
                     onClick={() => toggleDay(i + 1)}
                     className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all border ${classForm.days.includes(i + 1)
-                        ? "bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/20"
-                        : "bg-secondary text-muted-foreground border-border hover:border-primary/50"
+                      ? "bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/20"
+                      : "bg-secondary text-muted-foreground border-border hover:border-primary/50"
                       }`}
                   >
                     {day}

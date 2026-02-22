@@ -15,6 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
+import { useGymId } from "@/hooks/useGymId";
 
 const PLAN_GRADIENTS = [
   "from-primary to-emerald-600",
@@ -56,6 +57,7 @@ const fetchPlans = async () => {
 
 const MembershipsTab = () => {
   const queryClient = useQueryClient();
+  const { data: gymId } = useGymId();
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -82,7 +84,8 @@ const MembershipsTab = () => {
       const { error } = await supabase.from("membership_plans").insert([{
         name: planForm.name,
         price: parseFloat(planForm.price),
-        features: features
+        features: features,
+        gym_id: gymId
       }]);
       if (error) throw error;
     },

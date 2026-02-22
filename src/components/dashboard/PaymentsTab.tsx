@@ -29,6 +29,7 @@ import { Label } from "@/components/ui/label";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
+import { useGymId } from "@/hooks/useGymId";
 
 const fetchPayments = async () => {
   const { data, error } = await supabase
@@ -96,6 +97,7 @@ const getStatusBadge = (status: string) => {
 
 const PaymentsTab = () => {
   const queryClient = useQueryClient();
+  const { data: gymId } = useGymId();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -122,7 +124,8 @@ const PaymentsTab = () => {
     mutationFn: async (payment: typeof newPayment) => {
       const { error } = await supabase.from("payments").insert([{
         ...payment,
-        amount: parseFloat(payment.amount)
+        amount: parseFloat(payment.amount),
+        gym_id: gymId
       }]);
       if (error) throw error;
     },
