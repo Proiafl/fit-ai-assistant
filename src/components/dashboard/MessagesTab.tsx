@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { Search, Send, Phone, MoreVertical, Loader2 } from "lucide-react";
+import { Search, Send, Phone, MoreVertical, Loader2, ShieldAlert, ShieldCheck, Timer } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
+import { useSecurity } from "@/hooks/useSecurity";
 
 const fetchConversations = async () => {
   const { data, error } = await supabase
@@ -35,6 +36,7 @@ const fetchMessages = async (conversationId: string) => {
 
 const MessagesTab = () => {
   const queryClient = useQueryClient();
+  const { security, validateMessage } = useSecurity();
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [newMessage, setNewMessage] = useState("");
@@ -58,12 +60,18 @@ const MessagesTab = () => {
 
   const sendMessageMutation = useMutation({
     mutationFn: async (content: string) => {
+      // Security validation before sending
+      const check = validateMessage(content);
+      if (!check.safe) {
+        throw new Error(check.message || 'Mensaje bloqueado por seguridad.');
+      }
+
       const { error } = await supabase
         .from("messages")
         .insert([
           {
             conversation_id: selectedChatId,
-            content,
+            content: check.sanitized!, // Use sanitized version
             sender_type: "admin",
           },
         ]);
@@ -73,7 +81,7 @@ const MessagesTab = () => {
       await supabase
         .from("conversations")
         .update({
-          last_message: content,
+          last_message: check.sanitized,
           last_message_time: new Date().toISOString()
         })
         .eq("id", selectedChatId);
@@ -213,25 +221,44 @@ const MessagesTab = () => {
 
             {/* Message input */}
             <div className="p-4 border-t border-border">
+              {/* Security block banner */}
+              {security.isBlocked && (
+                <div className="mb-3 flex items-center gap-3 p-3 bg-destructive/10 border border-destructive/30 rounded-xl">
+                  <ShieldAlert className="w-5 h-5 text-destructive flex-shrink-0" />
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-destructive">Chat bloqueado por seguridad</p>
+                    <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                      <Timer className="w-3 h-3" />
+                      Disponible en {Math.ceil(security.minutesRemaining)} minutos
+                    </p>
+                  </div>
+                </div>
+              )}
+              {!security.isBlocked && (
+                <div className="mb-2 flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <ShieldCheck className="w-3 h-3 text-primary" />
+                  <span>Mensajes protegidos contra inyección</span>
+                </div>
+              )}
               <div className="flex items-center gap-3">
                 <Input
-                  placeholder="Escribe un mensaje..."
-                  className="flex-1 bg-secondary border-border"
+                  placeholder={security.isBlocked ? `Bloqueado — ${Math.ceil(security.minutesRemaining)} min restantes` : "Escribe un mensaje..."}
+                  className={`flex-1 bg-secondary border-border ${security.isBlocked ? 'opacity-50 cursor-not-allowed' : ''}`}
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
-                  disabled={sendMessageMutation.isPending}
+                  disabled={sendMessageMutation.isPending || security.isBlocked}
                   onKeyDown={(e) => {
-                    if (e.key === "Enter" && newMessage.trim()) {
+                    if (e.key === "Enter" && newMessage.trim() && !security.isBlocked) {
                       sendMessageMutation.mutate(newMessage);
                     }
                   }}
                 />
                 <Button
-                  onClick={() => newMessage.trim() && sendMessageMutation.mutate(newMessage)}
-                  disabled={sendMessageMutation.isPending || !newMessage.trim()}
+                  onClick={() => newMessage.trim() && !security.isBlocked && sendMessageMutation.mutate(newMessage)}
+                  disabled={sendMessageMutation.isPending || !newMessage.trim() || security.isBlocked}
                   className="bg-primary text-primary-foreground hover:bg-primary/90"
                 >
-                  <Send className="w-5 h-5" />
+                  {security.isBlocked ? <ShieldAlert className="w-5 h-5" /> : <Send className="w-5 h-5" />}
                 </Button>
               </div>
             </div>
