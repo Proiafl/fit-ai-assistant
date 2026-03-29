@@ -1,10 +1,29 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Dark background rounded square -->
+  <rect width="64" height="64" rx="14" fill="#0d1f12"/>
+  <!-- Green glow backdrop -->
+  <rect width="64" height="64" rx="14" fill="url(#glow)" opacity="0.6"/>
+  <!-- Zap / Lightning bolt icon (matches lucide-react Zap) -->
+  <path
+    d="M36 4 L18 36 H30 L28 60 L46 28 H34 Z"
+    fill="#22c55e"
+    stroke="#16a34a"
+    stroke-width="0.5"
+  />
+  <!-- Subtle highlight -->
+  <path
+    d="M36 4 L18 36 H30 L28 60 L46 28 H34 Z"
+    fill="url(#shine)"
+    opacity="0.3"
+  />
   <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#22c55e"/>
-      <stop offset="100%" style="stop-color:#10b981"/>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#22c55e" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#0d1f12" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="shine" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#22c55e" stop-opacity="0"/>
     </linearGradient>
   </defs>
-  <rect width="32" height="32" rx="8" fill="url(#bg)"/>
-  <path d="M18 6L10 18h5l-1 8 8-12h-5l1-8z" fill="white" stroke="white" stroke-width="1" stroke-linejoin="round" stroke-linecap="round"/>
 </svg>
