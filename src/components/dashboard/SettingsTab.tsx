@@ -1,15 +1,13 @@
 import { useState } from "react";
-import { Building2, Bot, MessageCircle } from "lucide-react";
+import { Building2, Bot } from "lucide-react";
 import GymInfoTab from "./settings/GymInfoTab";
 import AIAgentTab from "./settings/AIAgentTab";
-import WhatsAppTab from "./settings/WhatsAppTab";
 
-type SettingsSection = "gym" | "agent" | "whatsapp";
+type SettingsSection = "gym" | "agent";
 
 const sections: { id: SettingsSection; label: string; icon: React.ElementType; desc: string }[] = [
   { id: "gym", label: "Info del Gym", icon: Building2, desc: "Datos generales, contacto y horarios" },
-  { id: "agent", label: "Agente IA", icon: Bot, desc: "Personalidad, mensajes y capacidades" },
-  { id: "whatsapp", label: "WhatsApp", icon: MessageCircle, desc: "Conexión con Twilio y configuración" },
+  { id: "agent", label: "Agente IA", icon: Bot, desc: "Personalidad, mensajes y capacidades del bot" },
 ];
 
 const SettingsTab = () => {
@@ -44,7 +42,6 @@ const SettingsTab = () => {
       {/* Active tab content */}
       {active === "gym" && <GymInfoTab />}
       {active === "agent" && <AIAgentTab />}
-      {active === "whatsapp" && <WhatsAppTab />}
     </div>
   );
 };
