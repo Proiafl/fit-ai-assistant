@@ -121,29 +121,41 @@ const MessagesTab = () => {
         throw new Error(check.message || "Mensaje bloqueado por seguridad.");
       }
 
-      const { error } = await supabase
-        .from("messages")
-        .insert([{
-          conversation_id: selectedChatId,
-          content: check.sanitized!,
-          sender_type: "admin",
-        }]);
-      if (error) throw error;
-
-      // When admin sends a message manually, auto-enable human takeover
       const conv = conversations?.find(c => c.id === selectedChatId);
-      if (conv && conv.ai_enabled && !conv.human_takeover) {
-        await supabase
-          .from("conversations")
-          .update({
-            last_message: check.sanitized,
-            last_message_time: new Date().toISOString(),
-            human_takeover: true,
-            human_takeover_at: new Date().toISOString(),
-            ai_enabled: false,
-          })
-          .eq("id", selectedChatId);
+      const isWhatsApp = !!conv?.whatsapp_phone;
+
+      if (isWhatsApp) {
+        // Send via Twilio through Edge Function (saves to DB + sends to WhatsApp)
+        const { data: { session } } = await supabase.auth.getSession();
+        const res = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-whatsapp`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${session?.access_token}`,
+            },
+            body: JSON.stringify({
+              conversation_id: selectedChatId,
+              message: check.sanitized,
+            }),
+          }
+        );
+        const result = await res.json();
+        if (!res.ok) {
+          throw new Error(result.error || "Error al enviar el mensaje de WhatsApp");
+        }
       } else {
+        // Non-WhatsApp conversation: save directly to DB
+        const { error } = await supabase
+          .from("messages")
+          .insert([{
+            conversation_id: selectedChatId,
+            content: check.sanitized!,
+            sender_type: "admin",
+          }]);
+        if (error) throw error;
+
         await supabase
           .from("conversations")
           .update({
@@ -157,6 +169,9 @@ const MessagesTab = () => {
       queryClient.invalidateQueries({ queryKey: ["messages", selectedChatId] });
       queryClient.invalidateQueries({ queryKey: ["conversations"] });
       setNewMessage("");
+    },
+    onError: (err: Error) => {
+      toast.error(err.message || "Error al enviar el mensaje");
     },
   });
 
