@@ -126,14 +126,12 @@ const MessagesTab = () => {
 
       if (isWhatsApp) {
         // Send via Twilio through Edge Function (saves to DB + sends to WhatsApp)
-        const { data: { session } } = await supabase.auth.getSession();
         const res = await fetch(
           `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-whatsapp`,
           {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              "Authorization": `Bearer ${session?.access_token}`,
             },
             body: JSON.stringify({
               conversation_id: selectedChatId,
